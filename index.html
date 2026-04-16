@@ -4,367 +4,520 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kazconference — Управленческая панель</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%236366f1'/><text x='50%%' y='55%%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='18' font-family='sans-serif' font-weight='bold'>K</text></svg>" />
-  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prop-types@15.8.1/prop-types.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/recharts@2.5.0/umd/Recharts.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.9/babel.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%236366f1'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='18' font-family='sans-serif' font-weight='bold'>K</text></svg>" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #111827; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #1f2937; }
-    ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
-    .card { background: #1f2937; border-radius: 12px; border: 1px solid #374151; padding: 20px; }
-    .sidebar-btn { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; background: transparent; }
-    .sidebar-btn:hover { background: #374151; color: #fff; }
-    .sidebar-btn.active { background: rgba(99,102,241,0.2); color: #818cf8; }
-    .sidebar-btn:not(.active) { color: #9ca3af; }
-    .badge { padding: 2px 8px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
-    table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; padding: 8px 0; font-weight: 500; color: #9ca3af; border-bottom: 1px solid #374151; }
-    td { padding: 10px 0; border-bottom: 1px solid rgba(55,65,81,0.5); }
-    .updated { font-size: 11px; color: #6b7280; text-align: center; padding: 8px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#111827;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#1f2937}::-webkit-scrollbar-thumb{background:#4b5563;border-radius:3px}
+    #loading{display:flex;align-items:center;justify-content:center;height:100vh;font-size:18px;color:#9ca3af}
+    .dot{animation:pulse 1.5s infinite;margin:0 3px;font-size:24px}
+    .dot:nth-child(2){animation-delay:0.3s}.dot:nth-child(3){animation-delay:0.6s}
+    @keyframes pulse{0%,80%,100%{opacity:0.3}40%{opacity:1}}
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root"><div id="loading">Загрузка<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>
+
+  <!-- React -->
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <!-- Recharts deps -->
+  <script src="https://cdn.jsdelivr.net/npm/prop-types@15.8.1/prop-types.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/recharts@2.5.0/umd/Recharts.js"></script>
+  <!-- Babel for JSX -->
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.9/babel.min.js"></script>
+
   <script>
-    // === REAL DATA (generated 2026-04-16 08:09) ===
-    window.DASHBOARD_DATA = {
-      generatedAt: "2026-04-16T08:09:25.285167",
-      year: 2026,
-      dateStr: "16.04.2026, Thursday",
-      totalRevenue: 0,
-      totalExpenses: 0,
-      totalProfit: 0,
-      totalDZ: 1181763051,
-      revChange: 0,
-      profitChange: 0,
-      crmStats: {"total": 1647, "won": 622, "lost": 974, "active": 51, "total_revenue": 560472274, "active_amount": 17997380, "conversion": 37.8},
-      pnl: [],
-      dds: [],
-      expensesByCat: [],
-      debtors: [{"client": "Не выбран", "amount": 664034302, "days": 2616, "status": "critical"}, {"client": "ЧК GOCROWD LIMITED", "amount": 198881000, "days": 1025, "status": "critical"}, {"client": "Международный научно-техническ", "amount": 84881864, "days": 2543, "status": "critical"}, {"client": "Олжас Байтурсынов", "amount": 80000000, "days": 994, "status": "critical"}, {"client": "ТОО \"EdCrunch Academy\"", "amount": 46804786, "days": 1599, "status": "critical"}, {"client": "Географически удаленный офис В", "amount": 40365699, "days": 2645, "status": "critical"}, {"client": "Гербалайф", "amount": 35190000, "days": 2636, "status": "critical"}, {"client": "ТОО «AV SERVICES»", "amount": 31605400, "days": 1708, "status": "critical"}],
-      funnel: [{"stage": "ВЗЯТ В РАБОТУ (квал)", "count": 29, "amount": 11641060}, {"stage": "КП ОТПРАВЛЕНО", "count": 11, "amount": 2770000}, {"stage": "ДОГОВОР НАПРАВЛЕН/ПРОЕКТ ПОДТВЕРЖДЕН", "count": 6, "amount": 707600}, {"stage": "СЧЕТ ВЫСТАВЛЕН", "count": 3, "amount": 1449600}, {"stage": "ПРЕДОПЛАТА ПОЛУЧЕНА", "count": 1, "amount": 0}, {"stage": "ДОГОВОР ПОДПИСАН", "count": 1, "amount": 1429120}],
-      payments: [{"date": "", "description": "Поступление", "amount": 1000000, "type": "income"}, {"date": "", "description": "Поступление", "amount": 50000, "type": "income"}, {"date": "", "description": "Поступление", "amount": 80000, "type": "income"}, {"date": "", "description": "Поступление", "amount": 480000, "type": "income"}, {"date": "", "description": "Поступление", "amount": 120000, "type": "income"}, {"date": "", "description": "Поступление", "amount": 147000, "type": "income"}, {"date": "", "description": "Поступление", "amount": 300000, "type": "income"}, {"date": "", "description": "Поступление", "amount": 40000, "type": "income"}],
-    };
+    // Verify libs loaded
+    window.addEventListener('DOMContentLoaded', function(){
+      console.log('React:', !!window.React);
+      console.log('ReactDOM:', !!window.ReactDOM);
+      console.log('Recharts:', !!window.Recharts);
+      console.log('Babel:', !!window.Babel);
+    });
   </script>
 
   <script type="text/babel">
-    const { useState } = React;
-    const D = window.DASHBOARD_DATA;
-    const Rec = window.Recharts || {};
+    const {useState} = React;
+    const R = window.Recharts || {};
     const {
-      BarChart = () => null, Bar = () => null,
-      PieChart = () => null, Pie = () => null, Cell = () => null,
-      XAxis = () => null, YAxis = () => null, CartesianGrid = () => null,
-      Tooltip = () => null, ResponsiveContainer = ({children}) => React.createElement('div', {style:{width:'100%'}}, children),
-      Legend = () => null, Area = () => null, AreaChart = () => null
-    } = Rec;
+      BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis,
+      CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart
+    } = R;
 
-    const Icon = ({ name, size = 18 }) => {
-      const icons = {
-        "dollar-sign": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
-        "trending-up": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
-        "trending-down": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>,
-        "folder": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>,
-        "users": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-        "globe": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
-        "check-circle": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
-        "bar-chart": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>,
-        "alert-triangle": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-        "activity": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
-        "calendar": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-        "file-text": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
-        "clock": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-        "search": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-        "menu": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
-        "x": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-        "settings": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>,
-      };
-      return <span style={{display:"inline-flex",alignItems:"center"}}>{icons[name] || null}</span>;
+    // ── Data ──
+    const revenueData = [
+      {month:"Янв",revenue:12500000,expenses:9800000,profit:2700000},
+      {month:"Фев",revenue:15200000,expenses:11400000,profit:3800000},
+      {month:"Мар",revenue:18700000,expenses:13200000,profit:5500000},
+      {month:"Апр",revenue:14300000,expenses:10900000,profit:3400000},
+      {month:"Май",revenue:21000000,expenses:15600000,profit:5400000},
+      {month:"Июн",revenue:19500000,expenses:14200000,profit:5300000},
+      {month:"Июл",revenue:16800000,expenses:12100000,profit:4700000},
+      {month:"Авг",revenue:22400000,expenses:16300000,profit:6100000},
+      {month:"Сен",revenue:25100000,expenses:17800000,profit:7300000},
+      {month:"Окт",revenue:23600000,expenses:16900000,profit:6700000},
+      {month:"Ноя",revenue:27800000,expenses:19200000,profit:8600000},
+      {month:"Дек",revenue:31200000,expenses:21500000,profit:9700000},
+    ];
+    const ddsData = [
+      {month:"Янв",inflow:14200000,outflow:11500000},
+      {month:"Фев",inflow:16800000,outflow:13200000},
+      {month:"Мар",inflow:20100000,outflow:15800000},
+      {month:"Апр",inflow:15600000,outflow:12400000},
+      {month:"Май",inflow:23400000,outflow:18100000},
+      {month:"Июн",inflow:21200000,outflow:16500000},
+    ];
+    const projectsData = [
+      {name:"KIAF 2026",status:"active",budget:45000000,spent:28000000,deadline:"15 мая 2026",client:"МКС"},
+      {name:"TechSummit Astana",status:"active",budget:32000000,spent:12000000,deadline:"20 июня 2026",client:"Samruk-Kazyna"},
+      {name:"Форум HR Leaders",status:"planning",budget:18000000,spent:2500000,deadline:"10 сен 2026",client:"КБТУ"},
+      {name:"Digital Bridge",status:"active",budget:55000000,spent:41000000,deadline:"28 апр 2026",client:"МЦРИАП"},
+      {name:"Green Energy Conf",status:"completed",budget:22000000,spent:20800000,deadline:"01 мар 2026",client:"Samruk-Energy"},
+      {name:"MedExpo 2026",status:"planning",budget:15000000,spent:800000,deadline:"15 ноя 2026",client:"МЗ РК"},
+    ];
+    const crmDeals = [
+      {stage:"Новые лиды",count:12,amount:48000000},
+      {stage:"Переговоры",count:8,amount:156000000},
+      {stage:"КП отправлено",count:5,amount:89000000},
+      {stage:"Согласование",count:3,amount:67000000},
+      {stage:"Закрыто (Won)",count:4,amount:95000000},
+    ];
+    const googleAdsData = [
+      {campaign:"Конференции Алматы",spend:450000,clicks:3200,conversions:48,cpa:9375},
+      {campaign:"Ивенты Астана",spend:320000,clicks:2100,conversions:31,cpa:10323},
+      {campaign:"Бренд кампания",spend:180000,clicks:5400,conversions:92,cpa:1957},
+      {campaign:"Ретаргетинг",spend:210000,clicks:1800,conversions:54,cpa:3889},
+    ];
+    const asanaTasks = [
+      {name:"Согласовать площадку KIAF",assignee:"Алия К.",due:"14 апр",priority:"high",project:"KIAF 2026"},
+      {name:"Подготовить смету TechSummit",assignee:"Марат Б.",due:"16 апр",priority:"high",project:"TechSummit"},
+      {name:"Заказать оборудование со склада",assignee:"Ерлан Т.",due:"18 апр",priority:"medium",project:"KIAF 2026"},
+      {name:"Дизайн баннеров",assignee:"Динара С.",due:"20 апр",priority:"medium",project:"TechSummit"},
+      {name:"Найти переводчиков (EN/RU/KZ)",assignee:"Айгуль М.",due:"22 апр",priority:"low",project:"HR Leaders"},
+      {name:"Финальная сверка бюджета",assignee:"Марат Б.",due:"25 апр",priority:"high",project:"Digital Bridge"},
+    ];
+    const debtors = [
+      {client:"ТОО «Медиа Групп»",amount:4500000,days:45,status:"overdue"},
+      {client:"АО «Казтехно»",amount:8200000,days:12,status:"normal"},
+      {client:"ИП Сериков",amount:1200000,days:60,status:"critical"},
+      {client:"ТОО «Event Pro»",amount:3400000,days:30,status:"warning"},
+    ];
+    const payments = [
+      {date:"14 апр",description:"Аренда площадки Almaty Towers",amount:2800000,type:"expense"},
+      {date:"15 апр",description:"Оплата от МКС за KIAF",amount:12000000,type:"income"},
+      {date:"18 апр",description:"Зарплата (1-я часть)",amount:6500000,type:"expense"},
+      {date:"20 апр",description:"Оплата от Samruk за TechSummit",amount:8000000,type:"income"},
+      {date:"25 апр",description:"Закуп оборудования",amount:3200000,type:"expense"},
+    ];
+    const expensesByDept = [
+      {name:"Техн. отдел",value:8500000,color:"#6366f1"},
+      {name:"Проектный отдел",value:12300000,color:"#06b6d4"},
+      {name:"Маркетинг",value:4200000,color:"#f59e0b"},
+      {name:"Админ",value:3100000,color:"#10b981"},
+    ];
+
+    // ── Helpers ──
+    const fmt = v => {
+      if(v>=1e9) return (v/1e9).toFixed(1)+"B ₸";
+      if(v>=1e6) return (v/1e6).toFixed(1)+"M ₸";
+      if(v>=1e3) return (v/1e3).toFixed(0)+"K ₸";
+      return v+" ₸";
+    };
+    const totalRevenue = revenueData.reduce((s,d)=>s+d.revenue,0);
+    const totalProfit = revenueData.reduce((s,d)=>s+d.profit,0);
+    const totalDebt = debtors.reduce((s,d)=>s+d.amount,0);
+    const activeProjects = projectsData.filter(p=>p.status==="active").length;
+
+    // ── SVG Icons ──
+    const I = {
+      dollar: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+      up: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+      down: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>,
+      folder: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>,
+      users: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+      globe: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+      check: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+      bar: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>,
+      alert: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+      activity: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+      calendar: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+      file: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,
+      clock: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+      menu: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+      x: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+      settings: s=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>,
     };
 
-    const fmt = (val) => {
-      if (val >= 1000000000) return (val / 1000000000).toFixed(1) + "B \u20B8";
-      if (val >= 1000000) return (val / 1000000).toFixed(1) + "M \u20B8";
-      if (val >= 1000) return (val / 1000).toFixed(0) + "K \u20B8";
-      return val + " \u20B8";
+    // ── Styles ──
+    const S = {
+      card: {background:"#1f2937",borderRadius:12,border:"1px solid #374151",padding:20},
+      row: (cols,gap=16) => ({display:"grid",gridTemplateColumns:`repeat(${cols},1fr)`,gap}),
+      flex: {display:"flex",alignItems:"center"},
+      badge: (bg,c) => ({padding:"2px 8px",borderRadius:9999,fontSize:12,fontWeight:500,backgroundColor:bg,color:c,display:"inline-block"}),
+      bar: (pct,color="#6366f1") => ({height:10,borderRadius:9999,background:`linear-gradient(to right,${color},#22d3ee)`,width:`${pct}%`,transition:"width .3s"}),
+      barBg: {width:"100%",background:"#374151",borderRadius:9999,height:10},
+      pbar: (pct) => ({height:8,borderRadius:9999,backgroundColor:pct>90?"#ef4444":"#6366f1",width:`${pct}%`}),
+      sub: {color:"#9ca3af",fontSize:14},
+      sm: {color:"#9ca3af",fontSize:12},
+      item: {padding:12,background:"rgba(55,65,81,0.5)",borderRadius:8},
     };
-
-    const StatusBadge = ({ status }) => {
-      const s = {
-        normal: { bg: "rgba(16,185,129,0.2)", color: "#34d399", label: "В норме" },
-        warning: { bg: "rgba(245,158,11,0.2)", color: "#fbbf24", label: "Внимание" },
-        overdue: { bg: "rgba(239,68,68,0.2)", color: "#f87171", label: "Просрочено" },
-        critical: { bg: "rgba(239,68,68,0.2)", color: "#f87171", label: "Критично" },
-      }[status] || { bg: "#374151", color: "#9ca3af", label: status };
-      return <span className="badge" style={{ backgroundColor: s.bg, color: s.color }}>{s.label}</span>;
+    const badges = {
+      active:S.badge("rgba(16,185,129,.2)","#34d399"),planning:S.badge("rgba(59,130,246,.2)","#60a5fa"),
+      completed:S.badge("rgba(107,114,128,.2)","#9ca3af"),high:S.badge("rgba(239,68,68,.2)","#f87171"),
+      medium:S.badge("rgba(245,158,11,.2)","#fbbf24"),low:S.badge("rgba(16,185,129,.2)","#34d399"),
+      overdue:S.badge("rgba(239,68,68,.2)","#f87171"),warning:S.badge("rgba(245,158,11,.2)","#fbbf24"),
+      normal:S.badge("rgba(16,185,129,.2)","#34d399"),critical:S.badge("rgba(239,68,68,.2)","#f87171"),
     };
+    const badgeLabels = {active:"Активный",planning:"Планирование",completed:"Завершён",high:"Высокий",medium:"Средний",low:"Низкий",overdue:"Просрочено",warning:"Внимание",normal:"В норме",critical:"Критично"};
 
-    const Card = ({ children, style = {} }) => <div className="card" style={style}>{children}</div>;
+    const Badge = ({s}) => <span style={badges[s]||badges.normal}>{badgeLabels[s]||s}</span>;
 
-    const MetricCard = ({ icon, label, value, change, positive, color }) => (
-      <div className="card">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+    const MetricCard = ({icon,label,value,change,positive,color}) => (
+      <div style={S.card}>
+        <div style={{...S.flex,justifyContent:"space-between",alignItems:"flex-start"}}>
           <div>
-            <p style={{ color: "#9ca3af", fontSize: 14, marginBottom: 4 }}>{label}</p>
-            <p style={{ fontSize: 24, fontWeight: 700 }}>{value}</p>
-            {change && <div style={{ display: "flex", alignItems: "center", marginTop: 8, fontSize: 14, color: positive ? "#34d399" : "#f87171" }}>
-              <Icon name={positive ? "trending-up" : "trending-down"} size={14} />
-              <span style={{ marginLeft: 4 }}>{change}</span>
+            <p style={{...S.sub,marginBottom:4}}>{label}</p>
+            <p style={{fontSize:24,fontWeight:700}}>{value}</p>
+            {change && <div style={{...S.flex,marginTop:8,fontSize:14,color:positive?"#34d399":"#f87171",gap:4}}>
+              <span style={{display:"inline-flex"}}>{positive?I.up(14):I.down(14)}</span>{change}
             </div>}
           </div>
-          <div style={{ padding: 12, borderRadius: 8, backgroundColor: color }}>
-            <Icon name={icon} size={22} />
-          </div>
+          <div style={{padding:12,borderRadius:8,backgroundColor:color,display:"inline-flex"}}>{icon(22)}</div>
         </div>
       </div>
     );
 
-    const SectionHeader = ({ icon, title, subtitle }) => (
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        <div style={{ padding: 8, borderRadius: 8, backgroundColor: "rgba(99,102,241,0.2)" }}>
-          <Icon name={icon} size={18} />
-        </div>
-        <div>
-          <h2 style={{ fontSize: 18, fontWeight: 600 }}>{title}</h2>
-          {subtitle && <p style={{ color: "#9ca3af", fontSize: 12 }}>{subtitle}</p>}
-        </div>
+    const Hdr = ({icon,title,sub}) => (
+      <div style={{...S.flex,gap:12,marginBottom:16}}>
+        <div style={{padding:8,borderRadius:8,backgroundColor:"rgba(99,102,241,.2)",display:"inline-flex",color:"#818cf8"}}>{icon(18)}</div>
+        <div><h2 style={{fontSize:18,fontWeight:600}}>{title}</h2>{sub&&<p style={S.sm}>{sub}</p>}</div>
       </div>
     );
+
+    const hasCharts = !!AreaChart;
 
     function App() {
-      const [activeTab, setActiveTab] = useState("overview");
-      const [sidebarOpen, setSidebarOpen] = useState(true);
-
+      const [tab,setTab] = useState("overview");
+      const [open,setOpen] = useState(true);
       const tabs = [
-        { id: "overview", label: "Обзор", icon: "bar-chart" },
-        { id: "finance", label: "Финансы", icon: "dollar-sign" },
-        { id: "crm", label: "CRM", icon: "users" },
+        {id:"overview",label:"Обзор",icon:I.bar},
+        {id:"finance",label:"Финансы",icon:I.dollar},
+        {id:"projects",label:"Проекты",icon:I.folder},
+        {id:"crm",label:"CRM",icon:I.users},
+        {id:"ads",label:"Google Ads",icon:I.globe},
+        {id:"tasks",label:"Задачи",icon:I.check},
       ];
-
-      const maxFunnel = Math.max(...D.funnel.map(f => f.amount), 1);
+      const dateStr = new Date().toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric",weekday:"long"});
 
       return (
-        <div style={{ minHeight: "100vh", display: "flex", background: "#111827" }}>
-          <aside style={{ width: sidebarOpen ? 256 : 64, background: "#1f2937", borderRight: "1px solid #374151", display: "flex", flexDirection: "column", transition: "width 0.3s", flexShrink: 0 }}>
-            <div style={{ padding: 16, borderBottom: "1px solid #374151", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              {sidebarOpen && <div><h1 style={{ fontSize: 18, fontWeight: 700 }}>Kazconference</h1><p style={{ fontSize: 12, color: "#9ca3af" }}>Управленческая панель</p></div>}
-              <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ padding: 6, borderRadius: 8, background: "transparent", border: "none", cursor: "pointer", color: "#fff" }}>
-                <Icon name={sidebarOpen ? "x" : "menu"} size={18} />
-              </button>
+        <div style={{minHeight:"100vh",display:"flex",background:"#111827"}}>
+          {/* Sidebar */}
+          <aside style={{width:open?256:64,background:"#1f2937",borderRight:"1px solid #374151",display:"flex",flexDirection:"column",transition:"width .3s",flexShrink:0}}>
+            <div style={{padding:16,borderBottom:"1px solid #374151",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              {open&&<div><h1 style={{fontSize:18,fontWeight:700}}>Kazconference</h1><p style={S.sm}>Управленческая панель</p></div>}
+              <button onClick={()=>setOpen(!open)} style={{padding:6,borderRadius:8,background:"transparent",border:"none",cursor:"pointer",color:"#fff"}}>{open?I.x(18):I.menu(18)}</button>
             </div>
-            <nav style={{ flex: 1, padding: 12, display: "flex", flexDirection: "column", gap: 4 }}>
-              {tabs.map(tab => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={"sidebar-btn " + (activeTab === tab.id ? "active" : "")}>
-                  <Icon name={tab.icon} size={18} />
-                  {sidebarOpen && <span>{tab.label}</span>}
-                </button>
+            <nav style={{flex:1,padding:12,display:"flex",flexDirection:"column",gap:4}}>
+              {tabs.map(t=>(
+                <button key={t.id} onClick={()=>setTab(t.id)} style={{
+                  width:"100%",display:"flex",alignItems:"center",gap:12,padding:"10px 12px",borderRadius:8,fontSize:14,border:"none",cursor:"pointer",
+                  background:tab===t.id?"rgba(99,102,241,.2)":"transparent",color:tab===t.id?"#818cf8":"#9ca3af",transition:"all .2s"
+                }}>{t.icon(18)}{open&&<span>{t.label}</span>}</button>
               ))}
             </nav>
+            <div style={{padding:12,borderTop:"1px solid #374151"}}>
+              <button style={{width:"100%",display:"flex",alignItems:"center",gap:12,padding:"10px 12px",borderRadius:8,fontSize:14,border:"none",cursor:"pointer",background:"transparent",color:"#9ca3af"}}>
+                {I.settings(18)}{open&&<span>Настройки</span>}
+              </button>
+            </div>
           </aside>
 
-          <main style={{ flex: 1, overflow: "auto" }}>
-            <header style={{ background: "#1f2937", borderBottom: "1px solid #374151", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 }}>
-              <div>
-                <h2 style={{ fontSize: 20, fontWeight: 600 }}>{tabs.find(t => t.id === activeTab)?.label}</h2>
-                <p style={{ color: "#9ca3af", fontSize: 14 }}>{D.dateStr}</p>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#6366f1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 500 }}>OG</div>
-                {sidebarOpen && <span style={{ fontSize: 14 }}>Olzhas</span>}
+          {/* Main */}
+          <main style={{flex:1,overflow:"auto"}}>
+            <header style={{background:"#1f2937",borderBottom:"1px solid #374151",padding:"16px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:10}}>
+              <div><h2 style={{fontSize:20,fontWeight:600}}>{tabs.find(t=>t.id===tab)?.label}</h2><p style={S.sub}>{dateStr}</p></div>
+              <div style={{...S.flex,gap:8}}>
+                <div style={{width:32,height:32,borderRadius:"50%",background:"#6366f1",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:500}}>OG</div>
+                {open&&<span style={{fontSize:14}}>Olzhas</span>}
               </div>
             </header>
 
-            <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 24 }}>
+            <div style={{padding:24,display:"flex",flexDirection:"column",gap:24}}>
 
-              {/* OVERVIEW */}
-              {activeTab === "overview" && <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-                  <MetricCard icon="dollar-sign" label={"Выручка (" + D.year + ")"} value={fmt(D.totalRevenue)} change={D.revChange + "% к пр. году"} positive={D.revChange >= 0} color="rgba(16,185,129,0.3)" />
-                  <MetricCard icon="trending-up" label="Чистая прибыль" value={fmt(D.totalProfit)} change={D.profitChange + "% к пр. году"} positive={D.profitChange >= 0} color="rgba(99,102,241,0.3)" />
-                  <MetricCard icon="users" label="Сделки (активные)" value={D.crmStats.active} change={D.crmStats.won + " выиграно"} positive={true} color="rgba(6,182,212,0.3)" />
-                  <MetricCard icon="alert-triangle" label="Дебиторка" value={fmt(D.totalDZ)} change={D.debtors.filter(d => d.status === "critical").length + " критичных"} positive={false} color="rgba(239,68,68,0.3)" />
+              {/* ── OVERVIEW ── */}
+              {tab==="overview"&&<>
+                <div style={S.row(4)}>
+                  <MetricCard icon={I.dollar} label="Выручка (год)" value={fmt(totalRevenue)} change="+18% к пр. году" positive color="rgba(16,185,129,.3)"/>
+                  <MetricCard icon={I.up} label="Чистая прибыль" value={fmt(totalProfit)} change="+24% к пр. году" positive color="rgba(99,102,241,.3)"/>
+                  <MetricCard icon={I.folder} label="Активных проектов" value={activeProjects} change="2 в планировании" positive color="rgba(6,182,212,.3)"/>
+                  <MetricCard icon={I.alert} label="Дебиторка" value={fmt(totalDebt)} change="1 просрочка >60 дн" positive={false} color="rgba(239,68,68,.3)"/>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
-                  <Card>
-                    <SectionHeader icon="trending-up" title="P&L — Выручка и прибыль" subtitle={"Помесячная динамика за " + D.year} />
-                    <ResponsiveContainer width="100%" height={280}>
-                      <AreaChart data={D.pnl}>
+                <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:16}}>
+                  <div style={S.card}>
+                    <Hdr icon={I.up} title="P&L — Выручка и прибыль" sub="Помесячная динамика за 2026 год"/>
+                    {hasCharts ? <ResponsiveContainer width="100%" height={280}>
+                      <AreaChart data={revenueData}>
                         <defs>
-                          <linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} /><stop offset="95%" stopColor="#6366f1" stopOpacity={0} /></linearGradient>
-                          <linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10b981" stopOpacity={0.3} /><stop offset="95%" stopColor="#10b981" stopOpacity={0} /></linearGradient>
+                          <linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6366f1" stopOpacity={.3}/><stop offset="95%" stopColor="#6366f1" stopOpacity={0}/></linearGradient>
+                          <linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10b981" stopOpacity={.3}/><stop offset="95%" stopColor="#10b981" stopOpacity={0}/></linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} />
-                        <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={(v) => (v/1000000).toFixed(0) + "M"} />
-                        <Tooltip contentStyle={{ backgroundColor: "#1f2937", border: "1px solid #374151", borderRadius: "8px", color: "#fff" }} formatter={(v) => fmt(v)} />
-                        <Area type="monotone" dataKey="revenue" stroke="#6366f1" fill="url(#gr)" name="Выручка" />
-                        <Area type="monotone" dataKey="profit" stroke="#10b981" fill="url(#gp)" name="Прибыль" />
-                        <Legend />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151"/>
+                        <XAxis dataKey="month" stroke="#9ca3af" fontSize={12}/>
+                        <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={v=>(v/1e6).toFixed(0)+"M"}/>
+                        <Tooltip contentStyle={{backgroundColor:"#1f2937",border:"1px solid #374151",borderRadius:8,color:"#fff"}} formatter={v=>fmt(v)}/>
+                        <Area type="monotone" dataKey="revenue" stroke="#6366f1" fill="url(#gr)" name="Выручка"/>
+                        <Area type="monotone" dataKey="profit" stroke="#10b981" fill="url(#gp)" name="Прибыль"/>
+                        <Legend/>
                       </AreaChart>
-                    </ResponsiveContainer>
-                  </Card>
-                  <Card>
-                    <SectionHeader icon="bar-chart" title="Расходы по категориям" subtitle={"Топ за " + D.year} />
-                    <ResponsiveContainer width="100%" height={200}>
-                      <PieChart>
-                        <Pie data={D.expensesByCat} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={4}>
-                          {D.expensesByCat.map((e, i) => <Cell key={i} fill={e.color} />)}
-                        </Pie>
-                        <Tooltip contentStyle={{ backgroundColor: "#1f2937", border: "1px solid #374151", borderRadius: "8px", color: "#fff" }} formatter={(v) => fmt(v)} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
-                      {D.expensesByCat.map((d, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 14 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <div style={{ width: 12, height: 12, borderRadius: "50%", backgroundColor: d.color }} />
-                            <span style={{ color: "#d1d5db" }}>{d.name}</span>
-                          </div>
-                          <span style={{ fontWeight: 500 }}>{fmt(d.value)}</span>
+                    </ResponsiveContainer> : <p style={S.sub}>Графики загружаются...</p>}
+                  </div>
+                  <div style={S.card}>
+                    <Hdr icon={I.bar} title="Расходы по отделам" sub="Текущий месяц"/>
+                    {hasCharts ? <ResponsiveContainer width="100%" height={200}>
+                      <PieChart><Pie data={expensesByDept} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={4}>
+                        {expensesByDept.map((e,i)=><Cell key={i} fill={e.color}/>)}
+                      </Pie><Tooltip contentStyle={{backgroundColor:"#1f2937",border:"1px solid #374151",borderRadius:8,color:"#fff"}} formatter={v=>fmt(v)}/></PieChart>
+                    </ResponsiveContainer> : null}
+                    <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>
+                      {expensesByDept.map((d,i)=>(
+                        <div key={i} style={{...S.flex,justifyContent:"space-between",fontSize:14}}>
+                          <div style={{...S.flex,gap:8}}><div style={{width:12,height:12,borderRadius:"50%",backgroundColor:d.color}}/><span style={{color:"#d1d5db"}}>{d.name}</span></div>
+                          <span style={{fontWeight:500}}>{fmt(d.value)}</span>
                         </div>
                       ))}
                     </div>
-                  </Card>
+                  </div>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                  <Card>
-                    <SectionHeader icon="users" title="Воронка AmoCRM" subtitle={"Активных сделок: " + D.crmStats.active} />
-                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                      {D.funnel.map((deal, i) => (
-                        <div key={i}>
-                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 4 }}>
-                            <span style={{ color: "#d1d5db" }}>{deal.stage}</span>
-                            <span style={{ fontWeight: 500 }}>{deal.count} · {fmt(deal.amount)}</span>
-                          </div>
-                          <div style={{ width: "100%", background: "#374151", borderRadius: 9999, height: 10 }}>
-                            <div style={{ height: 10, borderRadius: 9999, background: "linear-gradient(to right, #6366f1, #22d3ee)", width: (deal.amount / maxFunnel * 100) + "%" }} />
-                          </div>
+                <div style={S.row(2)}>
+                  <div style={S.card}>
+                    <Hdr icon={I.users} title="Воронка AmoCRM" sub="Текущие сделки"/>
+                    {crmDeals.map((d,i)=>(
+                      <div key={i} style={{marginBottom:12}}>
+                        <div style={{...S.flex,justifyContent:"space-between",fontSize:14,marginBottom:4}}>
+                          <span style={{color:"#d1d5db"}}>{d.stage}</span>
+                          <span style={{fontWeight:500}}>{d.count} сделок · {fmt(d.amount)}</span>
                         </div>
-                      ))}
-                    </div>
-                  </Card>
-
-                  <Card>
-                    <SectionHeader icon="calendar" title="Последние операции" />
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      {D.payments.map((p, i) => (
-                        <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 12, background: "rgba(55,65,81,0.5)", borderRadius: 8 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                            <div style={{ width: 8, height: 8, borderRadius: "50%", background: p.type === "income" ? "#34d399" : "#f87171" }} />
-                            <div>
-                              <p style={{ fontSize: 14 }}>{p.description}</p>
-                              <p style={{ fontSize: 12, color: "#9ca3af" }}>{p.date}</p>
-                            </div>
-                          </div>
-                          <span style={{ fontSize: 14, fontWeight: 500, color: p.type === "income" ? "#34d399" : "#f87171" }}>
-                            {p.type === "income" ? "+" : "\u2212"}{fmt(p.amount)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                </div>
-
-                <Card>
-                  <SectionHeader icon="alert-triangle" title="Дебиторская задолженность" subtitle="Топ дебиторов" />
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                    {D.debtors.map((d, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 12, background: "rgba(55,65,81,0.5)", borderRadius: 8 }}>
-                        <div>
-                          <p style={{ fontSize: 14, fontWeight: 500 }}>{d.client}</p>
-                          <p style={{ fontSize: 12, color: "#9ca3af" }}>{d.days} дней</p>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                          <span style={{ fontSize: 14, fontWeight: 500 }}>{fmt(d.amount)}</span>
-                          <StatusBadge status={d.status} />
-                        </div>
+                        <div style={S.barBg}><div style={S.bar(d.amount/1600000)}/></div>
                       </div>
                     ))}
                   </div>
-                </Card>
-              </>}
-
-              {/* FINANCE */}
-              {activeTab === "finance" && <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-                  <MetricCard icon="dollar-sign" label="Выручка" value={fmt(D.totalRevenue)} change={D.revChange + "%"} positive={D.revChange >= 0} color="rgba(16,185,129,0.3)" />
-                  <MetricCard icon="trending-up" label="Прибыль" value={fmt(D.totalProfit)} change={D.profitChange + "%"} positive={D.profitChange >= 0} color="rgba(99,102,241,0.3)" />
-                  <MetricCard icon="alert-triangle" label="Дебиторка" value={fmt(D.totalDZ)} positive={false} color="rgba(239,68,68,0.3)" />
-                  <MetricCard icon="activity" label="Расходы" value={fmt(D.totalExpenses)} color="rgba(245,158,11,0.3)" />
+                  <div style={S.card}>
+                    <Hdr icon={I.check} title="Срочные задачи (Asana)" sub="Ближайшие дедлайны"/>
+                    {asanaTasks.filter(t=>t.priority==="high").map((t,i)=>(
+                      <div key={i} style={{...S.item,...S.flex,justifyContent:"space-between",marginBottom:12}}>
+                        <div style={{flex:1}}><p style={{fontSize:14,fontWeight:500}}>{t.name}</p><p style={{...S.sm,marginTop:2}}>{t.project} · {t.assignee}</p></div>
+                        <div style={{...S.flex,gap:8}}><span style={S.sm}>{t.due}</span><Badge s={t.priority}/></div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <Card>
-                  <SectionHeader icon="activity" title="ДДС — Поступления и списания" subtitle={"Помесячно за " + D.year} />
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={D.dds}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} />
-                      <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={(v) => (v/1000000).toFixed(0) + "M"} />
-                      <Tooltip contentStyle={{ backgroundColor: "#1f2937", border: "1px solid #374151", borderRadius: "8px", color: "#fff" }} formatter={(v) => fmt(v)} />
-                      <Bar dataKey="inflow" fill="#6366f1" name="Поступления" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="outflow" fill="#f43f5e" name="Списания" radius={[4, 4, 0, 0]} />
-                      <Legend />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Card>
-                <Card>
-                  <SectionHeader icon="file-text" title="P&L — Детализация" />
-                  <table>
-                    <thead><tr>
-                      <th>Месяц</th><th style={{textAlign:"right"}}>Выручка</th><th style={{textAlign:"right"}}>Расходы</th><th style={{textAlign:"right"}}>Прибыль</th><th style={{textAlign:"right"}}>Маржа</th>
-                    </tr></thead>
-                    <tbody>
-                      {D.pnl.map((d, i) => (
-                        <tr key={i}>
-                          <td>{d.month}</td>
-                          <td style={{textAlign:"right",color:"#d1d5db"}}>{fmt(d.revenue)}</td>
-                          <td style={{textAlign:"right",color:"#f87171"}}>{fmt(d.expenses)}</td>
-                          <td style={{textAlign:"right",color: d.profit >= 0 ? "#34d399" : "#f87171"}}>{fmt(d.profit)}</td>
-                          <td style={{textAlign:"right",color:"#818cf8"}}>{d.revenue > 0 ? ((d.profit / d.revenue) * 100).toFixed(1) + "%" : "—"}</td>
+
+                <div style={S.row(2)}>
+                  <div style={S.card}>
+                    <Hdr icon={I.globe} title="Google Ads" sub="Активные кампании"/>
+                    <table style={{width:"100%",borderCollapse:"collapse",fontSize:14}}>
+                      <thead><tr style={{color:"#9ca3af",borderBottom:"1px solid #374151"}}>
+                        <th style={{textAlign:"left",padding:"8px 0",fontWeight:500}}>Кампания</th>
+                        <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>Расход</th>
+                        <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>Conv</th>
+                        <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>CPA</th>
+                      </tr></thead>
+                      <tbody>{googleAdsData.map((a,i)=>(
+                        <tr key={i} style={{borderBottom:"1px solid rgba(55,65,81,.5)"}}>
+                          <td style={{padding:"10px 0"}}>{a.campaign}</td>
+                          <td style={{textAlign:"right",color:"#d1d5db"}}>{fmt(a.spend)}</td>
+                          <td style={{textAlign:"right",color:"#34d399"}}>{a.conversions}</td>
+                          <td style={{textAlign:"right",color:"#d1d5db"}}>{fmt(a.cpa)}</td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </Card>
+                      ))}</tbody>
+                    </table>
+                  </div>
+                  <div style={S.card}>
+                    <Hdr icon={I.calendar} title="Платёжный календарь" sub="Ближайшие 2 недели"/>
+                    {payments.map((p,i)=>(
+                      <div key={i} style={{...S.item,...S.flex,justifyContent:"space-between",marginBottom:8}}>
+                        <div style={{...S.flex,gap:12}}>
+                          <div style={{width:8,height:8,borderRadius:"50%",background:p.type==="income"?"#34d399":"#f87171"}}/>
+                          <div><p style={{fontSize:14}}>{p.description}</p><p style={S.sm}>{p.date}</p></div>
+                        </div>
+                        <span style={{fontSize:14,fontWeight:500,color:p.type==="income"?"#34d399":"#f87171"}}>{p.type==="income"?"+":"−"}{fmt(p.amount)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={S.row(2)}>
+                  <div style={S.card}>
+                    <Hdr icon={I.alert} title="Дебиторская задолженность" sub="Требует внимания"/>
+                    {debtors.map((d,i)=>(
+                      <div key={i} style={{...S.item,...S.flex,justifyContent:"space-between",marginBottom:12}}>
+                        <div><p style={{fontSize:14,fontWeight:500}}>{d.client}</p><p style={S.sm}>{d.days} дней</p></div>
+                        <div style={{...S.flex,gap:12}}><span style={{fontSize:14,fontWeight:500}}>{fmt(d.amount)}</span><Badge s={d.status}/></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </>}
 
-              {/* CRM */}
-              {activeTab === "crm" && <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-                  <MetricCard icon="users" label="Всего сделок" value={D.crmStats.total} color="rgba(99,102,241,0.3)" />
-                  <MetricCard icon="check-circle" label="Выиграно" value={D.crmStats.won} color="rgba(16,185,129,0.3)" />
-                  <MetricCard icon="dollar-sign" label="В воронке" value={fmt(D.crmStats.active_amount)} color="rgba(6,182,212,0.3)" />
-                  <MetricCard icon="trending-up" label="Конверсия" value={D.crmStats.conversion + "%"} color="rgba(245,158,11,0.3)" />
+              {/* ── FINANCE ── */}
+              {tab==="finance"&&<>
+                <div style={S.row(4)}>
+                  <MetricCard icon={I.dollar} label="Выручка (год)" value={fmt(totalRevenue)} change="+18%" positive color="rgba(16,185,129,.3)"/>
+                  <MetricCard icon={I.up} label="Прибыль (год)" value={fmt(totalProfit)} change="+24%" positive color="rgba(99,102,241,.3)"/>
+                  <MetricCard icon={I.alert} label="Дебиторка" value={fmt(totalDebt)} change="4 контрагента" positive={false} color="rgba(239,68,68,.3)"/>
+                  <MetricCard icon={I.activity} label="Расходы" value={fmt(totalRevenue-totalProfit)} color="rgba(245,158,11,.3)"/>
                 </div>
-                <Card>
-                  <SectionHeader icon="users" title="Воронка продаж AmoCRM" />
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={D.funnel} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis type="number" stroke="#9ca3af" fontSize={12} tickFormatter={(v) => (v/1000000).toFixed(0) + "M"} />
-                      <YAxis type="category" dataKey="stage" stroke="#9ca3af" fontSize={12} width={200} />
-                      <Tooltip contentStyle={{ backgroundColor: "#1f2937", border: "1px solid #374151", borderRadius: "8px", color: "#fff" }} formatter={(v) => fmt(v)} />
-                      <Bar dataKey="amount" fill="#6366f1" name="Сумма" radius={[0, 4, 4, 0]} />
+                <div style={S.card}>
+                  <Hdr icon={I.activity} title="ДДС — Поступления и списания" sub="Помесячно"/>
+                  {hasCharts ? <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={ddsData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151"/>
+                      <XAxis dataKey="month" stroke="#9ca3af" fontSize={12}/>
+                      <YAxis stroke="#9ca3af" fontSize={12} tickFormatter={v=>(v/1e6).toFixed(0)+"M"}/>
+                      <Tooltip contentStyle={{backgroundColor:"#1f2937",border:"1px solid #374151",borderRadius:8,color:"#fff"}} formatter={v=>fmt(v)}/>
+                      <Bar dataKey="inflow" fill="#6366f1" name="Поступления" radius={[4,4,0,0]}/>
+                      <Bar dataKey="outflow" fill="#f43f5e" name="Списания" radius={[4,4,0,0]}/>
+                      <Legend/>
                     </BarChart>
-                  </ResponsiveContainer>
-                </Card>
+                  </ResponsiveContainer> : <p style={S.sub}>Графики загружаются...</p>}
+                </div>
+                <div style={S.card}>
+                  <Hdr icon={I.file} title="P&L — Детализация" sub="Помесячно"/>
+                  <table style={{width:"100%",borderCollapse:"collapse",fontSize:14}}>
+                    <thead><tr style={{color:"#9ca3af",borderBottom:"1px solid #374151"}}>
+                      <th style={{textAlign:"left",padding:"8px 0",fontWeight:500}}>Месяц</th>
+                      <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>Выручка</th>
+                      <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>Расходы</th>
+                      <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>Прибыль</th>
+                      <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>Маржа</th>
+                    </tr></thead>
+                    <tbody>{revenueData.map((d,i)=>(
+                      <tr key={i} style={{borderBottom:"1px solid rgba(55,65,81,.5)"}}>
+                        <td style={{padding:"10px 0"}}>{d.month}</td>
+                        <td style={{textAlign:"right",color:"#d1d5db"}}>{fmt(d.revenue)}</td>
+                        <td style={{textAlign:"right",color:"#f87171"}}>{fmt(d.expenses)}</td>
+                        <td style={{textAlign:"right",color:"#34d399"}}>{fmt(d.profit)}</td>
+                        <td style={{textAlign:"right",color:"#818cf8"}}>{((d.profit/d.revenue)*100).toFixed(1)}%</td>
+                      </tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+              </>}
+
+              {/* ── PROJECTS ── */}
+              {tab==="projects"&&<>
+                <div style={S.row(3)}>
+                  <MetricCard icon={I.folder} label="Активные" value={projectsData.filter(p=>p.status==="active").length} color="rgba(16,185,129,.3)"/>
+                  <MetricCard icon={I.clock} label="В планировании" value={projectsData.filter(p=>p.status==="planning").length} color="rgba(59,130,246,.3)"/>
+                  <MetricCard icon={I.check} label="Завершённые" value={projectsData.filter(p=>p.status==="completed").length} color="rgba(107,114,128,.3)"/>
+                </div>
+                <div style={S.card}>
+                  <Hdr icon={I.folder} title="Реестр проектов"/>
+                  {projectsData.map((p,i)=>(
+                    <div key={i} style={{...S.item,marginBottom:16}}>
+                      <div style={{...S.flex,justifyContent:"space-between",marginBottom:12}}>
+                        <div><h3 style={{fontWeight:600}}>{p.name}</h3><p style={S.sub}>{p.client} · Дедлайн: {p.deadline}</p></div>
+                        <Badge s={p.status}/>
+                      </div>
+                      <div style={{...S.flex,justifyContent:"space-between",fontSize:14,marginBottom:8}}>
+                        <span style={{color:"#9ca3af"}}>Бюджет: {fmt(p.budget)}</span>
+                        <span>Потрачено: {fmt(p.spent)} ({((p.spent/p.budget)*100).toFixed(0)}%)</span>
+                      </div>
+                      <div style={{width:"100%",background:"#374151",borderRadius:9999,height:8}}>
+                        <div style={S.pbar(Math.min(p.spent/p.budget*100,100))}/>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>}
+
+              {/* ── CRM ── */}
+              {tab==="crm"&&<>
+                <div style={S.row(4)}>
+                  <MetricCard icon={I.users} label="Всего сделок" value={crmDeals.reduce((s,d)=>s+d.count,0)} color="rgba(99,102,241,.3)"/>
+                  <MetricCard icon={I.dollar} label="В воронке" value={fmt(crmDeals.reduce((s,d)=>s+d.amount,0))} color="rgba(16,185,129,.3)"/>
+                  <MetricCard icon={I.up} label="Конверсия" value="31%" change="+5% к пр. мес." positive color="rgba(6,182,212,.3)"/>
+                  <MetricCard icon={I.clock} label="Ср. цикл сделки" value="23 дня" change="−2 дня" positive color="rgba(245,158,11,.3)"/>
+                </div>
+                <div style={S.card}>
+                  <Hdr icon={I.users} title="Воронка продаж AmoCRM"/>
+                  {hasCharts ? <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={crmDeals} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151"/>
+                      <XAxis type="number" stroke="#9ca3af" fontSize={12} tickFormatter={v=>(v/1e6).toFixed(0)+"M"}/>
+                      <YAxis type="category" dataKey="stage" stroke="#9ca3af" fontSize={12} width={130}/>
+                      <Tooltip contentStyle={{backgroundColor:"#1f2937",border:"1px solid #374151",borderRadius:8,color:"#fff"}} formatter={v=>fmt(v)}/>
+                      <Bar dataKey="amount" fill="#6366f1" name="Сумма" radius={[0,4,4,0]}/>
+                    </BarChart>
+                  </ResponsiveContainer> : <p style={S.sub}>Графики загружаются...</p>}
+                </div>
+              </>}
+
+              {/* ── ADS ── */}
+              {tab==="ads"&&<>
+                <div style={S.row(4)}>
+                  <MetricCard icon={I.dollar} label="Общий расход" value={fmt(googleAdsData.reduce((s,d)=>s+d.spend,0))} color="rgba(239,68,68,.3)"/>
+                  <MetricCard icon={I.activity} label="Клики" value={googleAdsData.reduce((s,d)=>s+d.clicks,0).toLocaleString()} color="rgba(99,102,241,.3)"/>
+                  <MetricCard icon={I.check} label="Конверсии" value={googleAdsData.reduce((s,d)=>s+d.conversions,0)} color="rgba(16,185,129,.3)"/>
+                  <MetricCard icon={I.down} label="Средний CPA" value={fmt(Math.round(googleAdsData.reduce((s,d)=>s+d.spend,0)/googleAdsData.reduce((s,d)=>s+d.conversions,0)))} color="rgba(245,158,11,.3)"/>
+                </div>
+                <div style={S.card}>
+                  <Hdr icon={I.globe} title="Кампании Google Ads" sub="Детализация"/>
+                  <table style={{width:"100%",borderCollapse:"collapse",fontSize:14}}>
+                    <thead><tr style={{color:"#9ca3af",borderBottom:"1px solid #374151"}}>
+                      <th style={{textAlign:"left",padding:"8px 0",fontWeight:500}}>Кампания</th>
+                      <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>Расход</th>
+                      <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>Клики</th>
+                      <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>CTR</th>
+                      <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>Conv</th>
+                      <th style={{textAlign:"right",padding:"8px 0",fontWeight:500}}>CPA</th>
+                    </tr></thead>
+                    <tbody>{googleAdsData.map((a,i)=>(
+                      <tr key={i} style={{borderBottom:"1px solid rgba(55,65,81,.5)"}}>
+                        <td style={{padding:"10px 0",fontWeight:500}}>{a.campaign}</td>
+                        <td style={{textAlign:"right",color:"#d1d5db"}}>{fmt(a.spend)}</td>
+                        <td style={{textAlign:"right",color:"#d1d5db"}}>{a.clicks.toLocaleString()}</td>
+                        <td style={{textAlign:"right",color:"#22d3ee"}}>{((a.conversions/a.clicks)*100).toFixed(1)}%</td>
+                        <td style={{textAlign:"right",color:"#34d399"}}>{a.conversions}</td>
+                        <td style={{textAlign:"right",color:"#fbbf24"}}>{fmt(a.cpa)}</td>
+                      </tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+              </>}
+
+              {/* ── TASKS ── */}
+              {tab==="tasks"&&<>
+                <div style={S.row(3)}>
+                  <MetricCard icon={I.alert} label="Высокий" value={asanaTasks.filter(t=>t.priority==="high").length} color="rgba(239,68,68,.3)"/>
+                  <MetricCard icon={I.clock} label="Средний" value={asanaTasks.filter(t=>t.priority==="medium").length} color="rgba(245,158,11,.3)"/>
+                  <MetricCard icon={I.check} label="Низкий" value={asanaTasks.filter(t=>t.priority==="low").length} color="rgba(16,185,129,.3)"/>
+                </div>
+                <div style={S.card}>
+                  <Hdr icon={I.check} title="Задачи из Asana" sub="Все активные"/>
+                  {asanaTasks.map((t,i)=>(
+                    <div key={i} style={{...S.item,...S.flex,justifyContent:"space-between",marginBottom:8}}>
+                      <div style={{...S.flex,gap:12}}>
+                        <div style={{width:12,height:12,borderRadius:"50%",background:t.priority==="high"?"#f87171":t.priority==="medium"?"#fbbf24":"#34d399"}}/>
+                        <div><p style={{fontSize:14,fontWeight:500}}>{t.name}</p><p style={S.sm}>{t.project} · {t.assignee}</p></div>
+                      </div>
+                      <div style={{...S.flex,gap:12}}><span style={S.sub}>{t.due}</span><Badge s={t.priority}/></div>
+                    </div>
+                  ))}
+                </div>
               </>}
 
             </div>
-            <p className="updated">Данные обновлены: {new Date(D.generatedAt).toLocaleString("ru-RU")}</p>
+            <p style={{fontSize:11,color:"#4b5563",textAlign:"center",padding:8}}>Демо-данные · Kazconference Dashboard v1.0</p>
           </main>
         </div>
       );
     }
 
-    ReactDOM.render(<App />, document.getElementById("root"));
+    ReactDOM.render(<App/>, document.getElementById("root"));
   </script>
 </body>
 </html>
